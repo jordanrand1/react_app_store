@@ -7,27 +7,42 @@ import {
   Header,
   Card,
   Image,
+  Dropdown,
+  Divider,
+  Button,
 } from 'semantic-ui-react'
 
 class Apps extends React.Component {
+  state = { category: '' }
+
   componentDidMount() {
     this.props.dispatch(getApps())
   }
 
+  categoryOptions = () => {
+    const { categories } = this.props
+    return categories.map( (c) => { return{ key: c, text: c, value: c } } )
+  }
+
   apps = () => {
-    return this.props.apps.map( app => {
+    const { apps } = this.props
+    const { category } = this.state
+
+    let visible = apps
+
+    if (category)
+      visible = apps.filter( a => a.category === category )
+
+
+    return visible.map( app => {
       const { name, id, category, author, logo } = app
       return (
         <Card key={id}>
           <Image src={logo} />
           <Card.Content>
             <Card.Header>{name}</Card.Header>
-            <Card.Meta>
-              <span>{author}</span>
-            </Card.Meta>
-            <Card.Description>
-              {category}
-            </Card.Description>
+            <Card.Meta><span>{author}</span></Card.Meta>
+            <Card.Description>{category}</Card.Description>
           </Card.Content>
           <Card.Content extra>
             <Link to={`/apps/${app.id}`}>
@@ -39,10 +54,34 @@ class Apps extends React.Component {
     })
   }
 
+  handleChange = (e, { value }) => {
+    this.setState({ category: value })
+  }
+
   render() {
+    const { category } = this.state
+
     return (
       <Container>
         <Header as="h3" textAlign="center">Apps</Header>
+        <Dropdown
+          placeholder="Filter by..."
+          fluid
+          selection
+          options={this.categoryOptions()}
+          value={category}
+          onChange={this.handleChange}
+        />
+        { category && 
+            <Button
+              fluid  
+              basic
+              onClick={ () => this.setState({ category: '' }) }
+            >
+              Clear Filter: { category }
+            </Button>
+        }
+
         <Card.Group itemsPerRow={4} stackable>
           { this.apps() }
         </Card.Group>
@@ -52,7 +91,9 @@ class Apps extends React.Component {
 }
 
 const mapStateToProps = (state) => {
-  return { apps: state.apps }
+  const { apps } = state
+  const categories = [...new Set(apps.map( a => a.category ))]
+  return { apps, categories }
 }
 
 export default connect(mapStateToProps)(Apps)
