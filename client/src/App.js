@@ -7,7 +7,7 @@ import FetchApps from './components/FetchApps'
 const App = () => (
   <Switch>
     <Route exact path="/" component={Home} />
-    <Route eact path="/apps" component={FetchApps} />
+    <Route path="/apps" component={FetchApps} />
     <Route component={NoMatch} />
   </Switch>
 )

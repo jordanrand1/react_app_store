@@ -11,7 +11,6 @@ class Api::AppsController < ApplicationController
 
   def create
     app = App.create(app_params)
-
     if app.save
       render json: app
     else
@@ -32,7 +31,6 @@ class Api::AppsController < ApplicationController
   end
 
   private
-
     def set_app
       @app = App.find(params[:id])
     end
@@ -49,4 +47,11 @@ class Api::AppsController < ApplicationController
         :featured
       )
     end
+
+
+
+
+
+
+
 end

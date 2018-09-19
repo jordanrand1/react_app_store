@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { Fragment } from 'react'
 import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
 import {
@@ -10,13 +10,18 @@ import {
   Divider,
   Button,
 } from 'semantic-ui-react'
+import AppForm from './AppForm'
 
 class Apps extends React.Component {
-  state = { category: '' }
+  state = { category: '', showForm: false }
+
+  toggleForm = () => {
+    this.setState({ showForm: !this.state.showForm }) 
+  }
 
   categoryOptions = () => {
     const { categories } = this.props
-    return categories.map( (c) => { return{ key: c, text: c, value: c } } )
+    return categories.map( (c) => { return { key: c, text: c, value: c } } )
   }
 
   apps = () => {
@@ -25,9 +30,8 @@ class Apps extends React.Component {
 
     let visible = apps
 
-    if (category)
+    if (category) 
       visible = apps.filter( a => a.category === category )
-
 
     return visible.map( app => {
       const { name, id, category, author, logo } = app
@@ -35,9 +39,15 @@ class Apps extends React.Component {
         <Card key={id}>
           <Image src={logo} />
           <Card.Content>
-            <Card.Header>{name}</Card.Header>
-            <Card.Meta><span>{author}</span></Card.Meta>
-            <Card.Description>{category}</Card.Description>
+            <Card.Header>
+              {name}
+            </Card.Header>
+            <Card.Meta>
+              <span>{author}</span>
+            </Card.Meta>
+            <Card.Description>
+              {category}
+            </Card.Description>
           </Card.Content>
           <Card.Content extra>
             <Link to={`/apps/${app.id}`}>
@@ -49,37 +59,46 @@ class Apps extends React.Component {
     })
   }
 
-  handleChange = (e, { value }) => {
+  handleChange = (_, { value }) => {
     this.setState({ category: value })
   }
 
   render() {
-    const { category } = this.state
+    const { category, showForm } = this.state
 
     return (
       <Container>
         <Header as="h3" textAlign="center">Apps</Header>
-        <Dropdown
-          placeholder="Filter by..."
-          fluid
-          selection
-          options={this.categoryOptions()}
-          value={category}
-          onChange={this.handleChange}
-        />
-        { category && 
-            <Button
-              fluid  
-              basic
-              onClick={ () => this.setState({ category: '' }) }
-            >
-              Clear Filter: { category }
-            </Button>
-        }
-
-        <Card.Group itemsPerRow={4} stackable>
-          { this.apps() }
-        </Card.Group>
+        <Button onClick={this.toggleForm}>
+          { showForm ? 'Hide Form' : 'Show Form' }
+        </Button>
+        { showForm ?
+            <AppForm closeForm={this.toggleForm} />
+            :
+            <Fragment>
+              <Dropdown
+                placeholder="Filter by..."
+                fluid
+                selection
+                options={this.categoryOptions()}
+                value={category}
+                onChange={this.handleChange}
+              />
+              { category && 
+                  <Button
+                    fluid
+                    basic
+                    onClick={ () => this.setState({ category: '' }) }
+                  >
+                    Clear Filter: {category}
+                  </Button>
+              }
+              <Divider />
+              <Card.Group itemsPerRow={4} stackable>
+                { this.apps() }
+              </Card.Group>
+            </Fragment>
+          }
       </Container>
     )
   }
@@ -92,3 +111,4 @@ const mapStateToProps = (state) => {
 }
 
 export default connect(mapStateToProps)(Apps)
+
