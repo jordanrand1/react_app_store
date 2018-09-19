@@ -9,11 +9,11 @@ const enhancers = compose(
 
 const store = createStore(rootReducer, {}, enhancers)
 
-if(module.hot) {
+if (module.hot) {
   module.hot.accept('./reducers/', () => {
-    const nextRootReducer = require('./reducers/index').default
-    store.replaceReducer(nextRootReducer)
+    const nRR = require('./reducers/index').default
+    store.replaceReducer(nRR)
   })
 }
 
-export default Store
+export default store
